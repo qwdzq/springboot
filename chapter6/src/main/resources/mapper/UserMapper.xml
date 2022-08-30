@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjl.chapter6.mapper.UserMapper">
+
+    <select id="selectAllUser" resultMap="BaseResultMap">
+        SELECT
+            *
+        FROM user
+    </select>
+
+    <select id="selectOne" parameterType="Long" resultMap="BaseResultMap">
+        SELECT
+            *
+        FROM user
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertOneUser" parameterType="com.cjl.chapter6.model.User" useGeneratedKeys="true" timeout="20">
+        INSERT INTO user(name, age, city_id)
+        VALUES(
+               #{name, jdbcType=CHAR},
+               #{age, jdbcType=INTEGER},
+               #{city_id, jdbcType=INTEGER})
+    </insert>
+
+
+    <update id="updateByPrimaryKey" parameterType="com.cjl.chapter6.model.User">
+        update user
+            set name = #{name, jdbcType=CHAR},
+                age = #{age, jdbcType=INTEGER},
+                city_id = #{city_id, jdbcType=INTEGER}
+        where id = #{id, jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="long">
+        delete  from user
+            where id = #{id, jdbcType=INTEGER}
+    </delete>
+
+    <select id="selectUserByIdLike"  parameterType="hashmap"  resultType="com.cjl.chapter6.model.User">
+        select * from user where age = #{age}
+        <if test = "city_id != null">
+            and city_id=#{city_id}
+        </if>
+    </select>
+
+    <select id="selectUserUsePrefix"  parameterType="hashmap"  resultType="com.cjl.chapter6.model.User">
+        select * from user
+        <trim prefix="where">
+            age = #{age} and city_id=#{city_id}
+        </trim>
+    </select>
+
+    <select id="selectUserByWhere"  parameterType="hashmap"  resultType="com.cjl.chapter6.model.User">
+    select * from user
+    <where>
+        <if test  = "age !=null ">
+             age = #{age}
+        </if>
+        <if test = "city_id != null">
+            and city_id=#{city_id}
+        </if>
+    </where>
+</select>
+
+
+    <select id="selectUserByPrefixOverrides"  parameterType="hashmap"
+            resultType="com.cjl.chapter6.model.User">
+        select * from user
+        <trim prefix="where"  prefixOverrides="and">
+            <if test  = "age !=null ">
+                age = #{age}
+            </if>
+            <if test = "city_id != null">
+                and city_id=#{city_id}
+            </if>
+        </trim>
+    </select>
+
+    <select id="selectUserSet"  parameterType="hashmap"
+            resultType="com.cjl.chapter6.model.User">
+        update user
+        <set>
+            <if test  = "age !=null ">
+                age = #{age},
+            </if>
+
+            <if test = "name ！= null">
+                name = #{name},
+            </if>
+
+            <if test = "city_id != null">
+                city_id=#{city_id}
+            </if>
+        </set>
+       where id = #{id}
+    </select>
+
+    <select id="selectNames" parameterType="hashmap" resultType="hashmap">
+        select name, age, city_id from user where id = #{id}
+    </select>
+
+    <select id="selectPojo"     resultType="com.cjl.chapter6.model.User">
+        select  * from user where id = #{id}
+    </select>
+
+    <select id="selectUserByIdChoose"  parameterType="hashmap"  resultType="com.cjl.chapter6.model.User">
+        select * from user where age = #{age}
+        <choose>
+            <when test = "city_id != null">
+                and city_id=#{city_id}
+            </when>
+            <otherwise>
+                and id = 1
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectByIdList" resultType="com.cjl.chapter6.model.User">
+        select * from user where id in
+        <foreach collection="list"
+                 index="index"
+                 item="item"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <resultMap id="BaseResultMap" type="com.cjl.chapter6.model.User">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="INTEGER"/>
+        <result column="city_id" property="city_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,age,city_id
+    </sql>
+
+    <select id="selectUseSqlTag" parameterType="Long" resultType="com.cjl.chapter6.model.User">
+        select
+        <include refid="Base_Column_List"/>
+        from user where id = #{id}
+    </select>
+
+    <resultMap id="UserAndCityMap" type="com.cjl.chapter6.model.User">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="INTEGER"/>
+        <result column="city_id" property="city_id" jdbcType="INTEGER"/>
+        <!--association 用户关系映射 查询单个完整对象-->
+        <association property="city" javaType="com.cjl.chapter6.model.City">
+            <id column="city_id" property="cityId" jdbcType="BIGINT"/>
+            <result column="city_name" property="cityName" jdbcType="VARCHAR"/>
+            <result column="country" property="country" jdbcType="VARCHAR"/>
+        </association>
+
+    </resultMap>
+
+    <select id="selectUserAndCity" parameterType="long" resultMap="UserAndCityMap">
+        select u.id, u.name, u.age, u.city_id, c.city_name, c.city_id , c.country
+        from user u left join city c on u.city_id = c.city_id where u.id = #{id}
+    </select>
+
+</mapper>

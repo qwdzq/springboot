@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8" />
+    <title></title>
+</head>
+<body>
+<h3>这是我们第一个模板引擎</h3>
+<h1 th:text="${message}">大家好这是修改前的文字</h1>
+
+<div id="id1" th:id="new-id-thymeleaf"></div>
+<input type="text" value="input" th:value="new-thymeleaf-value"/>
+<div th:object="${user}">
+    第一：<span th:text="*{username}"></span>
+</div>
+<div>
+    第二：<span th:text="*{user.username}"></span>
+</div>
+<div th:object="${user}">
+    第三：<span th:text="${user.username}"></span>
+</div>
+
+<span th:with="a = '再次欢迎'" th:text="${a}"></span>
+<input type="button" value="提交" th:onclick=" 'submit()' " />
+
+
+<div th:if="'a' == 'b'"> a == b, 当表达式为true时展示</div>
+<div th:if="'a' == 'a'"> a == a, 当表达式为true时展示</div>
+<div th:if=" 'a' eq 'a'">a eq a, 当表达式为true时展示</div>
+<div th:unless=" 1==2 ">th:unless  1==2,当表达式为false时展示</div>
+
+<br>
+<div th:with="a = '2'" th:switch="${a}" >
+<span th:case="1">case = 1</span>
+<span th:case="3">case =3</span>
+<span th:case="2">case =2</span>
+</div>
+
+</body>
+</html>

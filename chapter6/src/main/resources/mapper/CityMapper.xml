@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjl.chapter6.mapper.CityMapper">
+
+    <resultMap id="CityAndScenicMap" type="com.cjl.chapter6.model.City">
+        <id column="city_id" property="cityId" jdbcType="BIGINT"/>
+        <result column="city_name" property="cityName" jdbcType="VARCHAR"/>
+        <result column="country" property="country" jdbcType="VARCHAR"/>
+
+        <collection property="scenics" ofType="com.cjl.chapter6.model.Scenic">
+            <id column="scenic_id" property="scenicId" jdbcType="BIGINT"/>
+            <result column="city_id" property="cityId" jdbcType="VARCHAR"/>
+            <result column="scenic_name" property="scenicName" jdbcType="VARCHAR"/>
+            <result column="price" property="price" jdbcType="INTEGER"/>
+        </collection>
+
+    </resultMap>
+
+    <select id="selectCityAndScenics" parameterType="long" resultMap="CityAndScenicMap">
+        select c.city_name, c.city_id , c.country, s.scenic_id, s.city_id, s.scenic_name, s.price
+        from city c left join scenic s on c.city_id = s.city_id where c.city_id = #{city_id}
+    </select>
+
+</mapper>
